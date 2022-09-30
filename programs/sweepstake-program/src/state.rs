@@ -5,10 +5,12 @@ pub struct User {
     pub authority: Pubkey,
     pub current_sweepstake_key: Option<Pubkey>,
     pub sweepstakes_submitted: u8,
+    pub id: i64,
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct SweepstakeData {
+    pub id: i64,
     pub world_champion: String,
     pub group_stage_1: String,
     pub group_stage_2: String,
@@ -22,6 +24,7 @@ pub struct SweepstakeData {
 
 #[account]
 pub struct Sweepstake {
+    pub id: i64,
     pub authority: Pubkey,
     pub world_champion: String,
     pub group_stage_1: String,

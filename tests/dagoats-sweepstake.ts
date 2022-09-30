@@ -47,7 +47,7 @@ describe("DaGOATs Sweepstake", () => {
   describe("Initialization", () => {
     it("Should initialize user state", async () => {
       await program.methods
-        .createUser()
+        .createUser(new anchor.BN(1))
         .accounts({
           userState: userState.publicKey,
           authority: player_a.publicKey,
@@ -62,7 +62,7 @@ describe("DaGOATs Sweepstake", () => {
     it("Should not initialize user state twice", () =>
       expect(
         program.methods
-          .createUser()
+          .createUser(new anchor.BN(1))
           .accounts({
             userState: userState.publicKey,
             authority: player_a.publicKey,
@@ -75,6 +75,7 @@ describe("DaGOATs Sweepstake", () => {
 
   describe("Sweepstake", () => {
     const input = {
+      id: new anchor.BN(1),
       worldChampion: "NL",
       finalGame: "NL-PL=1:0",
       thirdPlaceGame: "ES-CZ=0:0",
@@ -93,6 +94,7 @@ describe("DaGOATs Sweepstake", () => {
       expect(
         program.methods
           .createSweepstake({
+            id: new anchor.BN(1),
             finalGame: "",
             groupStage1: "",
             groupStage2: "",

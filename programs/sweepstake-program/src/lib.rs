@@ -14,10 +14,10 @@ declare_id!("HqRe8tqXAvD4at3dduSpK2kCNHs9XLosvNf6X5pPh4j8");
 pub mod dagoats_sweepstake {
     use super::*;
     use crate::validator::{
-        get_valid_world_champion, validate_deadline, validate_sweepstakes_per_wallet,
+        get_valid_id, get_valid_world_champion, validate_deadline, validate_sweepstakes_per_wallet,
     };
 
-    pub fn create_user(ctx: Context<SweepstakeInitialize>) -> Result<()> {
+    pub fn create_user(ctx: Context<SweepstakeInitialize>, user_id: i64) -> Result<()> {
         validate_deadline()?;
 
         let user_state = &mut ctx.accounts.user_state;
@@ -25,6 +25,7 @@ pub mod dagoats_sweepstake {
         user_state.current_sweepstake_key = None;
         user_state.sweepstakes_submitted = 0;
         user_state.authority = ctx.accounts.authority.key();
+        user_state.id = get_valid_id(user_id)?;
 
         Ok(())
     }
@@ -51,6 +52,7 @@ pub mod dagoats_sweepstake {
         sweepstake.group_stage_1 = get_valid_sweepstake_input(data.group_stage_1, 16)?;
         sweepstake.world_champion = get_valid_world_champion(data.world_champion)?;
         sweepstake.pre_sweepstake_key = None;
+        sweepstake.id = get_valid_id(data.id)?;
 
         user.current_sweepstake_key = Some(sweepstake.key());
         user.sweepstakes_submitted = user.sweepstakes_submitted + 1;
@@ -64,8 +66,8 @@ pub struct SweepstakeInitialize<'info> {
     #[account(
         init,
         payer = authority,
-        // discriminator + authority + sweepstakes_submitted + current_sweepstake_key
-        space = 8 + 32 + 1 + std::mem::size_of::<Option<Pubkey>>(),
+        // discriminator + authority + sweepstakes_submitted + current_sweepstake_key + id
+        space = 8 + 32 + 1 + std::mem::size_of::<Option<Pubkey>>() + 8,
     )]
     pub user_state: Account<'info, User>,
     #[account(mut)]
@@ -80,8 +82,8 @@ pub struct CreateSweepstake<'info> {
     #[account(
         init,
         payer = authority,
-        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + bump
-        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 1,
+        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + id
+        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
     )]
     pub sweepstake_state: Account<'info, Sweepstake>,
     #[account(mut)]

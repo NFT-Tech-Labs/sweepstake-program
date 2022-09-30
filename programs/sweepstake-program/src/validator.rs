@@ -25,6 +25,13 @@ pub fn get_valid_world_champion(data: String) -> Result<String> {
     Ok(data)
 }
 
+pub fn get_valid_id(id: i64) -> Result<i64> {
+    if id <= 0 {
+        return Err(error!(SweepstakeError::InvalidInputData));
+    }
+    Ok(id)
+}
+
 pub fn validate_deadline() -> Result<()> {
     if now() > SWEEPSTAKE_SUBMISSION_DEADLINE {
         return Err(error!(SweepstakeError::SweepstakeDisabled));
