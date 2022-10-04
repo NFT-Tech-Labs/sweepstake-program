@@ -140,7 +140,29 @@ describe("DaGOATs Sweepstake", () => {
         })
         .signers([player_a, player_a_sweepstake])
         .rpc();
+      const sweepstake = await program.account.sweepstake.fetch(
+        player_a_sweepstake.publicKey
+      );
+      const user = await program.account.user.fetch(userState.publicKey);
       expect(tx).not.to.be.empty;
+
+      expect(user.sweepstakesSubmitted).eq(1);
+      expect(user.currentSweepstakeKey.toBase58()).eq(
+        player_a_sweepstake.publicKey.toBase58()
+      );
+
+      expect(sweepstake.worldChampion).eq(input.worldChampion);
+      expect(sweepstake.thirdPlaceGame).eq(input.thirdPlaceGame);
+      expect(sweepstake.finalGame).eq(input.finalGame);
+      expect(sweepstake.semifinals).eq(input.semifinals);
+      expect(sweepstake.groupStage1).eq(input.groupStage1);
+      expect(sweepstake.roundOf16).eq(input.roundOf16);
+      expect(sweepstake.groupStage2).eq(input.groupStage2);
+      expect(sweepstake.groupStage3).eq(input.groupStage3);
+      expect(sweepstake.quarterFinals).eq(input.quarterFinals);
+      expect(sweepstake.id.toString()).eq(input.id.toString());
+      expect(sweepstake.authority.toBase58()).eq(player_a.publicKey.toBase58());
+      expect(sweepstake.preSweepstakeKey).to.be.null;
     });
 
     it("Should not create sweepstake to exceed limit per wallet", () => {
