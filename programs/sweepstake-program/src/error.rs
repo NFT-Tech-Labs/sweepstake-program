@@ -10,4 +10,6 @@ pub enum SweepstakeError {
     SweepstakeDisabled,
     #[msg("Sweepstake input data are not valid!")]
     InvalidInputData,
+    #[msg("Not enough tokens to pay for sweepstake!")]
+    InvalidSweepstakePrice,
 }

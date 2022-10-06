@@ -13,6 +13,13 @@ describe("DaGOATs Sweepstake", () => {
   const program = anchor.workspace
     .DagoatsSweepstake as anchor.Program<DagoatsSweepstake>;
 
+  const solPerSweepstake = LAMPORTS_PER_SOL;
+  const dagoatsSolWalletAddress = new anchor.web3.PublicKey(
+    "328vR2LdB9PaLq9eR7ad3Hj8shX9SzSZJhFpeeSkKXa4"
+  );
+  const fakeDagoatsSolWalletAddress = new anchor.web3.PublicKey(
+    "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1"
+  );
   const userState = anchor.web3.Keypair.generate();
   const player_a = anchor.web3.Keypair.generate();
   const player_b = anchor.web3.Keypair.generate();
@@ -20,7 +27,7 @@ describe("DaGOATs Sweepstake", () => {
 
   const airdrop = async (
     user: anchor.web3.Keypair,
-    amount = LAMPORTS_PER_SOL
+    amount = 3 * LAMPORTS_PER_SOL
   ) => {
     const signature = await provider.connection.requestAirdrop(
       user.publicKey,
@@ -41,6 +48,9 @@ describe("DaGOATs Sweepstake", () => {
       owner: owner.toBase58(),
     };
   };
+
+  const getBalance = (pubKey: anchor.web3.PublicKey) =>
+    provider.connection.getBalance(pubKey);
 
   before(() => Promise.all([airdrop(player_a), airdrop(player_b)]));
 
@@ -89,11 +99,12 @@ describe("DaGOATs Sweepstake", () => {
         "NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0",
       groupStage1:
         "NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0;NL-PL=1:0",
+      paymentAmount: new anchor.BN(solPerSweepstake),
     };
     it("Should not create sweepstake with invalid input data", () =>
       expect(
         program.methods
-          .createSweepstake({
+          .createSweepstakeSol({
             id: new anchor.BN(1),
             finalGame: "",
             groupStage1: "",
@@ -104,10 +115,12 @@ describe("DaGOATs Sweepstake", () => {
             semifinals: "",
             thirdPlaceGame: "",
             worldChampion: "",
+            paymentAmount: new anchor.BN(solPerSweepstake),
           })
           .accounts({
             userState: userState.publicKey,
             authority: player_a.publicKey,
+            dagoatsWallet: dagoatsSolWalletAddress,
             systemProgram: SystemProgram.programId,
             sweepstakeState: player_a_sweepstake.publicKey,
           })
@@ -118,10 +131,11 @@ describe("DaGOATs Sweepstake", () => {
     it("User should not create sweepstake for a different user", () =>
       expect(
         program.methods
-          .createSweepstake(input)
+          .createSweepstakeSol(input)
           .accounts({
             userState: userState.publicKey,
             authority: player_b.publicKey,
+            dagoatsWallet: dagoatsSolWalletAddress,
             systemProgram: SystemProgram.programId,
             sweepstakeState: player_a_sweepstake.publicKey,
           })
@@ -129,12 +143,29 @@ describe("DaGOATs Sweepstake", () => {
           .rpc()
       ).to.be.rejected);
 
+    it("User should not create sweepstake with a bad dagoats wallet", () =>
+      expect(
+        program.methods
+          .createSweepstakeSol(input)
+          .accounts({
+            userState: userState.publicKey,
+            authority: player_a.publicKey,
+            dagoatsWallet: fakeDagoatsSolWalletAddress,
+            systemProgram: SystemProgram.programId,
+            sweepstakeState: player_a_sweepstake.publicKey,
+          })
+          .signers([player_a, player_a_sweepstake])
+          .rpc()
+      ).to.be.rejected);
+
     it("Should create sweepstake", async () => {
+      const preBalance = await getBalance(dagoatsSolWalletAddress);
       const tx = await program.methods
-        .createSweepstake(input)
+        .createSweepstakeSol(input)
         .accounts({
           userState: userState.publicKey,
           authority: player_a.publicKey,
+          dagoatsWallet: dagoatsSolWalletAddress,
           systemProgram: SystemProgram.programId,
           sweepstakeState: player_a_sweepstake.publicKey,
         })
@@ -163,16 +194,20 @@ describe("DaGOATs Sweepstake", () => {
       expect(sweepstake.id.toString()).eq(input.id.toString());
       expect(sweepstake.authority.toBase58()).eq(player_a.publicKey.toBase58());
       expect(sweepstake.preSweepstakeKey).to.be.null;
+
+      const balance = await getBalance(dagoatsSolWalletAddress);
+      expect(balance - preBalance).eq(solPerSweepstake);
     });
 
     it("Should not create sweepstake to exceed limit per wallet", () => {
       const sweepstake = anchor.web3.Keypair.generate();
       return expect(
         program.methods
-          .createSweepstake(input)
+          .createSweepstakeSol(input)
           .accounts({
             userState: userState.publicKey,
             authority: player_a.publicKey,
+            dagoatsWallet: dagoatsSolWalletAddress,
             systemProgram: SystemProgram.programId,
             sweepstakeState: sweepstake.publicKey,
           })
