@@ -1,14 +1,10 @@
 use crate::error::SweepstakeError;
 use crate::now;
-use anchor_lang::prelude::*;
-use anchor_lang::solana_program::clock::UnixTimestamp;
-use anchor_lang::solana_program::native_token::LAMPORTS_PER_SOL;
+use anchor_lang::{prelude::*, solana_program::clock::UnixTimestamp};
 
 const MAX_SWEEPSTAKES_PER_WALLET: u8 = 1;
 // 1 hour before the first match = 2022-11-21T09:00:00Z (GMT timezone)
 const SWEEPSTAKE_SUBMISSION_DEADLINE: UnixTimestamp = 1669021200;
-// @todo: set correct price per sweepstake
-const LAMPORTS_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
 
 pub fn get_valid_sweepstake_input(data: String, expected_length: usize) -> Result<String> {
     let input = data
@@ -45,13 +41,6 @@ pub fn validate_deadline() -> Result<()> {
 pub fn validate_sweepstakes_per_wallet(sweepstakes: u8) -> Result<()> {
     if sweepstakes >= MAX_SWEEPSTAKES_PER_WALLET {
         return Err(error!(SweepstakeError::SweepstakeLimitExceeded));
-    }
-    Ok(())
-}
-
-pub fn validate_lamports_per_sweepstake(amount: u64) -> Result<()> {
-    if amount < LAMPORTS_PER_SWEEPSTAKE {
-        return Err(error!(SweepstakeError::InvalidSweepstakePrice));
     }
     Ok(())
 }

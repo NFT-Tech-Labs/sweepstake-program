@@ -3,7 +3,11 @@ use crate::state::{Sweepstake, SweepstakeData, User};
 use crate::validator::*;
 use anchor_lang::{
     prelude::*,
+    solana_program::native_token::LAMPORTS_PER_SOL,
     system_program::{transfer, Transfer},
+};
+use anchor_spl::token::{
+    transfer as token_transfer, Mint, Token, TokenAccount, Transfer as TokenTransfer,
 };
 
 pub mod common;
@@ -13,13 +17,21 @@ pub mod validator;
 
 declare_id!("HqRe8tqXAvD4at3dduSpK2kCNHs9XLosvNf6X5pPh4j8");
 
+const DUST_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
+
 // @todo: set correct dagoats wallet addresses
-const SOL_WALLET_ADDRESS: &str = "";
+const SOL_WALLET_ADDRESS: &str = "328vR2LdB9PaLq9eR7ad3Hj8shX9SzSZJhFpeeSkKXa4";
+const DUST_WALLET_ADDRESS: &str = "";
+
+// @todo: set correct price per sweepstake
+const LAMPORTS_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
+const DUST_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
 
 #[program]
 pub mod dagoats_sweepstake {
     use super::*;
 
+    // todo: add docs
     pub fn create_user(ctx: Context<SweepstakeInitialize>, user_id: i64) -> Result<()> {
         validate_deadline()?;
 
@@ -40,9 +52,21 @@ pub mod dagoats_sweepstake {
         let user = &mut ctx.accounts.user_state;
         let sweepstake = &mut ctx.accounts.sweepstake_state;
 
-        validate_lamports_per_sweepstake(data.payment_amount)?;
         create_sweepstake(ctx.accounts.authority.key(), user, sweepstake, &data)?;
-        transfer(ctx.accounts.to_transfer_context(), data.payment_amount)?;
+        transfer(ctx.accounts.to_transfer_context(), LAMPORTS_PER_SWEEPSTAKE)?;
+
+        Ok(())
+    }
+
+    pub fn create_sweepstake_dust(
+        ctx: Context<CreateSweepstakeDust>,
+        data: SweepstakeData,
+    ) -> Result<()> {
+        let user = &mut ctx.accounts.user_state;
+        let sweepstake = &mut ctx.accounts.sweepstake_state;
+
+        create_sweepstake(ctx.accounts.authority.key(), user, sweepstake, &data)?;
+        token_transfer(ctx.accounts.to_transfer_context(), DUST_PER_SWEEPSTAKE)?;
 
         Ok(())
     }
@@ -117,5 +141,50 @@ impl<'info> CreateSweepstakeSol<'info> {
             to: self.dagoats_wallet.to_account_info(),
         };
         CpiContext::new(self.system_program.to_account_info(), accounts)
+    }
+}
+
+#[derive(Accounts)]
+pub struct CreateSweepstakeDust<'info> {
+    #[account(mut, has_one = authority)]
+    pub user_state: Account<'info, User>,
+    #[account(
+        init,
+        payer = authority,
+        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + id
+        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
+    )]
+    pub sweepstake_state: Account<'info, Sweepstake>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(
+        address = DUST_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
+    )]
+    pub mint: Account<'info, Mint>,
+    #[account(
+        mut,
+        owner = authority.key(),
+        token::mint = mint,
+    )]
+    pub user_dust_wallet: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        address = DUST_WALLET_ADDRESS.parse::<Pubkey>().unwrap(),
+    )]
+    pub dagoats_wallet: Account<'info, TokenAccount>,
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+}
+
+impl<'info> CreateSweepstakeDust<'info> {
+    pub fn to_transfer_context(
+        &self,
+    ) -> CpiContext<'info, 'info, 'info, 'info, TokenTransfer<'info>> {
+        let accounts = TokenTransfer {
+            authority: self.authority.to_account_info(),
+            from: self.user_dust_wallet.to_account_info(),
+            to: self.dagoats_wallet.to_account_info(),
+        };
+        CpiContext::new(self.token_program.to_account_info(), accounts)
     }
 }

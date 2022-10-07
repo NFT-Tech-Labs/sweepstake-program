@@ -20,7 +20,6 @@ pub struct SweepstakeData {
     pub semifinals: String,
     pub third_place_game: String,
     pub final_game: String,
-    pub payment_amount: u64,
 }
 
 #[account]
