@@ -16,7 +16,7 @@ pub mod error;
 pub mod state;
 pub mod validator;
 
-declare_id!("HqRe8tqXAvD4at3dduSpK2kCNHs9XLosvNf6X5pPh4j8");
+declare_id!("7fjExfzR1qVGjj3bQDmDnHGs5fshPFE1nEZdCbCWCaed");
 
 const DUST_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
 

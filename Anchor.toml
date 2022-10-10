@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-dagoats_sweepstake = "HqRe8tqXAvD4at3dduSpK2kCNHs9XLosvNf6X5pPh4j8"
+dagoats_sweepstake = "7fjExfzR1qVGjj3bQDmDnHGs5fshPFE1nEZdCbCWCaed"
 
 [registry]
 url = "https://api.apr.dev"
