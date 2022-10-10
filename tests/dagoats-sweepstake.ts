@@ -15,10 +15,10 @@ describe("DaGOATs Sweepstake", () => {
 
   const solPerSweepstake = LAMPORTS_PER_SOL;
   const dagoatsSolWalletAddress = new anchor.web3.PublicKey(
-    "328vR2LdB9PaLq9eR7ad3Hj8shX9SzSZJhFpeeSkKXa4"
+    "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1"
   );
   const fakeDagoatsSolWalletAddress = new anchor.web3.PublicKey(
-    "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1"
+    "328vR2LdB9PaLq9eR7ad3Hj8shX9SzSZJhFpeeSkKXa4"
   );
 
   const user = anchor.web3.Keypair.generate();

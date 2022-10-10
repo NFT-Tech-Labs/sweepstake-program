@@ -20,18 +20,22 @@ declare_id!("HqRe8tqXAvD4at3dduSpK2kCNHs9XLosvNf6X5pPh4j8");
 const DUST_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
 
 // @todo: set correct dagoats wallet addresses
-const SOL_WALLET_ADDRESS: &str = "328vR2LdB9PaLq9eR7ad3Hj8shX9SzSZJhFpeeSkKXa4";
-const DUST_WALLET_ADDRESS: &str = "";
+const SOL_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
+const DUST_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
 
 // @todo: set correct price per sweepstake
 const LAMPORTS_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
-const DUST_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
+const DUST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
 
 #[program]
 pub mod dagoats_sweepstake {
     use super::*;
 
-    // todo: add docs
+    /// Initialize user state
+    /// - A user can be created before the start of the World Cup
+    /// - All the input data must be valid
+    /// Input data:
+    /// - `user_id`: User ID from the database (reference ID)
     pub fn create_user(ctx: Context<SweepstakeInitialize>, user_id: i64) -> Result<()> {
         validate_deadline()?;
 
@@ -45,6 +49,22 @@ pub mod dagoats_sweepstake {
         Ok(())
     }
 
+    /// Create sweepstake and pay in SOL for it
+    /// - A sweepstake can be created before the start of the World Cup
+    /// - All the input data must be valid
+    /// - User cannot exceed a number of sweepstakes per wallet
+    /// - Sweepstake must be paid in SOL
+    /// Input data:
+    /// - `id`: Sweepstake ID from the database (reference ID)
+    /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
+    /// - `group_stage_1`: Predicted results of the group stage 1 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `group_stage_2`: Predicted results of the group stage 2 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `group_stage_3`: Predicted results of the group stage 3 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `round_of_16`: Predicted results of the round of 16 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `quarter_finals`: Predicted results of the quarter finals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
     pub fn create_sweepstake_sol(
         ctx: Context<CreateSweepstakeSol>,
         data: SweepstakeData,
@@ -58,6 +78,22 @@ pub mod dagoats_sweepstake {
         Ok(())
     }
 
+    /// Create sweepstake and pay in DUST for it
+    /// - A sweepstake can be created before the start of the World Cup
+    /// - All the input data must be valid
+    /// - User cannot exceed a number of sweepstakes per wallet
+    /// - Sweepstake must be paid in DUST
+    /// Input data:
+    /// - `id`: Sweepstake ID from the database (reference ID)
+    /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
+    /// - `group_stage_1`: Predicted results of the group stage 1 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `group_stage_2`: Predicted results of the group stage 2 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `group_stage_3`: Predicted results of the group stage 3 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `round_of_16`: Predicted results of the round of 16 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `quarter_finals`: Predicted results of the quarter finals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
+    /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
     pub fn create_sweepstake_dust(
         ctx: Context<CreateSweepstakeDust>,
         data: SweepstakeData,
