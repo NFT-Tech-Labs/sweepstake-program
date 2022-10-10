@@ -9,6 +9,7 @@ use anchor_lang::{
 use anchor_spl::token::{
     transfer as token_transfer, Mint, Token, TokenAccount, Transfer as TokenTransfer,
 };
+use solana_security_txt::security_txt;
 
 pub mod common;
 pub mod error;
@@ -223,4 +224,15 @@ impl<'info> CreateSweepstakeDust<'info> {
         };
         CpiContext::new(self.token_program.to_account_info(), accounts)
     }
+}
+
+security_txt! {
+    name: "DaGOATs Sweepstake",
+    // @todo: Add sweepstake URL
+    project_url: "http://dagoats.io/",
+    // @todo: Add sweepstake contacts
+    contacts: "email:example@example.com,link:http://dagoats.io/,discord:SolRetroNFTs#8494",
+    // @todo: Add sweepstake policy
+    policy: "http://dagoats.io/",
+    preferred_languages: "en,es"
 }
