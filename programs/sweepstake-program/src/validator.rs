@@ -3,8 +3,8 @@ use crate::now;
 use anchor_lang::{prelude::*, solana_program::clock::UnixTimestamp};
 
 const MAX_SWEEPSTAKES_PER_WALLET: u8 = 1;
-// 1 hour before the first match = 2022-11-21T09:00:00Z (GMT timezone)
-const SWEEPSTAKE_SUBMISSION_DEADLINE: UnixTimestamp = 1669021200;
+// 2022-11-20T14:00:00Z
+const SWEEPSTAKE_SUBMISSION_DEADLINE: UnixTimestamp = 1668952800;
 
 pub fn get_valid_sweepstake_input(data: String, expected_length: usize) -> Result<String> {
     let input = data
