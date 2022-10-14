@@ -24,6 +24,10 @@ const LABS_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
 const LABS_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
 const LABS_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
 
+const TEST_MINT_ADDRESS: &str = "AKnL4NNf3DGWZJS6cPknBuEGnVsV4A4m5tgebLHaRSZ9";
+const TEST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
+const TEST_WALLET_ADDRESS: &str = "GreYZ8jbfridyk3y7TGqpTNRUuhAf7hzkvdZn8zwYHBh";
+
 pub struct SupportedToken {
     pub sweepstake_price: u64,
     mint_address: Pubkey,
@@ -61,5 +65,11 @@ pub fn get_supported_tokens() -> Vec<SupportedToken> {
             String::from(LABS_WALLET_ADDRESS),
             LABS_PER_SWEEPSTAKE,
         ),
+        // @todo: for testing purposes only!
+        // SupportedToken::new(
+        //     String::from(TEST_MINT_ADDRESS),
+        //     String::from(TEST_WALLET_ADDRESS),
+        //     TEST_PER_SWEEPSTAKE,
+        // ),
     ]
 }

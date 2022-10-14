@@ -46,17 +46,6 @@ pub mod dagoats_sweepstake {
     /// - All the input data must be valid
     /// - User cannot exceed a number of sweepstakes per wallet
     /// - Sweepstake must be paid in $SOL
-    /// Input data:
-    /// - `id`: Sweepstake ID from the database (reference ID)
-    /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
-    /// - `group_stage_1`: Predicted results of the group stage 1 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_2`: Predicted results of the group stage 2 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_3`: Predicted results of the group stage 3 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `round_of_16`: Predicted results of the round of 16 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `quarter_finals`: Predicted results of the quarter finals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
     pub fn create_sweepstake_sol(
         ctx: Context<CreateSweepstakeSol>,
         data: SweepstakeData,
@@ -75,17 +64,6 @@ pub mod dagoats_sweepstake {
     /// - All the input data must be valid
     /// - User cannot exceed a number of sweepstakes per wallet
     /// - Sweepstake must be paid in supported SPL token
-    /// Input data:
-    /// - `id`: Sweepstake ID from the database (reference ID)
-    /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
-    /// - `group_stage_1`: Predicted results of the group stage 1 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_2`: Predicted results of the group stage 2 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_3`: Predicted results of the group stage 3 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `round_of_16`: Predicted results of the round of 16 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `quarter_finals`: Predicted results of the quarter finals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
     pub fn create_sweepstake_spl(
         ctx: Context<CreateSweepstakeSpl>,
         data: SweepstakeData,
@@ -116,15 +94,7 @@ pub fn create_sweepstake(
 
     sweepstake.authority = authority;
     sweepstake.submitted_at = now();
-    sweepstake.final_game = get_valid_sweepstake_input(data.final_game.clone(), 1)?;
-    sweepstake.third_place_game = get_valid_sweepstake_input(data.third_place_game.clone(), 1)?;
-    sweepstake.semifinals = get_valid_sweepstake_input(data.semifinals.clone(), 2)?;
-    sweepstake.quarter_finals = get_valid_sweepstake_input(data.quarter_finals.clone(), 4)?;
-    sweepstake.round_of_16 = get_valid_sweepstake_input(data.round_of_16.clone(), 8)?;
-    sweepstake.group_stage_3 = get_valid_sweepstake_input(data.group_stage_3.clone(), 16)?;
-    sweepstake.group_stage_2 = get_valid_sweepstake_input(data.group_stage_2.clone(), 16)?;
-    sweepstake.group_stage_1 = get_valid_sweepstake_input(data.group_stage_1.clone(), 16)?;
-    sweepstake.world_champion = get_valid_world_champion(data.world_champion.clone())?;
+    sweepstake.predictions = data.predictions.clone();
     sweepstake.pre_sweepstake_key = None;
     sweepstake.id = get_valid_id(data.id)?;
 
@@ -155,8 +125,8 @@ pub struct CreateSweepstakeSol<'info> {
     #[account(
         init,
         payer = authority,
-        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + id
-        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
+        // discriminator + authority + SHA1 data + submitted_at + pre_sweepstake_key + id
+        space = 8 + 32 + 512 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
     )]
     pub sweepstake_state: Account<'info, Sweepstake>,
     #[account(mut)]
@@ -184,8 +154,8 @@ pub struct CreateSweepstakeSpl<'info> {
     #[account(
         init,
         payer = authority,
-        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + id
-        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
+        // discriminator + authority + SHA1 data + submitted_at + pre_sweepstake_key + id
+        space = 8 + 32 + 512 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
     )]
     pub sweepstake_state: Account<'info, Sweepstake>,
     #[account(mut)]
@@ -194,12 +164,14 @@ pub struct CreateSweepstakeSpl<'info> {
     pub mint: Account<'info, Mint>,
     #[account(
         mut,
-        owner = authority.key(),
-        token::mint = mint,
+        owner = token_program.key(),
+        associated_token::mint = mint,
+        associated_token::authority = authority,
     )]
     pub user_wallet: Account<'info, TokenAccount>,
     #[account(
         mut,
+        owner = token_program.key(),
         token::mint = mint,
     )]
     pub dagoats_wallet: Account<'info, TokenAccount>,
