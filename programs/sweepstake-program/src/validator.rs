@@ -1,10 +1,24 @@
+use crate::config::{get_supported_tokens, SupportedToken};
 use crate::error::SweepstakeError;
 use crate::now;
 use anchor_lang::{prelude::*, solana_program::clock::UnixTimestamp};
+use anchor_spl::token::{Mint, TokenAccount};
 
 const MAX_SWEEPSTAKES_PER_WALLET: u8 = 1;
 // 2022-11-20T14:00:00Z
 const SWEEPSTAKE_SUBMISSION_DEADLINE: UnixTimestamp = 1668952800;
+
+pub fn validate_supported_token(
+    mint: &Account<Mint>,
+    dagoats_account: &Account<TokenAccount>,
+) -> Result<SupportedToken> {
+    for token in get_supported_tokens() {
+        if token.eq(mint, dagoats_account) {
+            return Ok(token);
+        }
+    }
+    Err(error!(SweepstakeError::InvalidAccount))
+}
 
 pub fn get_valid_sweepstake_input(data: String, expected_length: usize) -> Result<String> {
     let input = data

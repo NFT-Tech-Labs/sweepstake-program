@@ -1,9 +1,9 @@
 use crate::common::now;
+use crate::config::{LAMPORTS_PER_SWEEPSTAKE, SOL_WALLET_ADDRESS};
 use crate::state::{Sweepstake, SweepstakeData, User};
 use crate::validator::*;
 use anchor_lang::{
     prelude::*,
-    solana_program::native_token::LAMPORTS_PER_SOL,
     system_program::{transfer, Transfer},
 };
 use anchor_spl::token::{
@@ -12,29 +12,12 @@ use anchor_spl::token::{
 use solana_security_txt::security_txt;
 
 pub mod common;
+pub mod config;
 pub mod error;
 pub mod state;
 pub mod validator;
 
 declare_id!("7fjExfzR1qVGjj3bQDmDnHGs5fshPFE1nEZdCbCWCaed");
-
-const DUST_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
-// todo: Sports Club token
-const TSC_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
-// todo: Launchlabs token
-const LABS_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
-
-// @todo: set correct dagoats wallet addresses
-const SOL_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
-const DUST_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
-const TSC_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
-const LABS_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
-
-// @todo: set correct price per sweepstake
-const LAMPORTS_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
-const DUST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
-const TSC_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
-const LABS_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
 
 #[program]
 pub mod dagoats_sweepstake {
@@ -58,11 +41,11 @@ pub mod dagoats_sweepstake {
         Ok(())
     }
 
-    /// Create sweepstake and pay in SOL for it
+    /// Create sweepstake and pay in $SOL for it
     /// - A sweepstake can be created before the start of the World Cup
     /// - All the input data must be valid
     /// - User cannot exceed a number of sweepstakes per wallet
-    /// - Sweepstake must be paid in SOL
+    /// - Sweepstake must be paid in $SOL
     /// Input data:
     /// - `id`: Sweepstake ID from the database (reference ID)
     /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
@@ -87,11 +70,11 @@ pub mod dagoats_sweepstake {
         Ok(())
     }
 
-    /// Create sweepstake and pay in $DUST for it
+    /// Create sweepstake and pay in supported SPL token for it
     /// - A sweepstake can be created before the start of the World Cup
     /// - All the input data must be valid
     /// - User cannot exceed a number of sweepstakes per wallet
-    /// - Sweepstake must be paid in $DUST
+    /// - Sweepstake must be paid in supported SPL token
     /// Input data:
     /// - `id`: Sweepstake ID from the database (reference ID)
     /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
@@ -103,73 +86,20 @@ pub mod dagoats_sweepstake {
     /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
     /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
     /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    pub fn create_sweepstake_dust(
-        ctx: Context<CreateSweepstakeDust>,
+    pub fn create_sweepstake_spl(
+        ctx: Context<CreateSweepstakeSpl>,
         data: SweepstakeData,
     ) -> Result<()> {
         let user = &mut ctx.accounts.user_state;
         let sweepstake = &mut ctx.accounts.sweepstake_state;
 
         create_sweepstake(ctx.accounts.authority.key(), user, sweepstake, &data)?;
-        token_transfer(ctx.accounts.to_transfer_context(), DUST_PER_SWEEPSTAKE)?;
-
-        Ok(())
-    }
-
-    /// Create sweepstake and pay in $TSC (Sports Club token) for it
-    /// - A sweepstake can be created before the start of the World Cup
-    /// - All the input data must be valid
-    /// - User cannot exceed a number of sweepstakes per wallet
-    /// - Sweepstake must be paid in $TSC
-    /// Input data:
-    /// - `id`: Sweepstake ID from the database (reference ID)
-    /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
-    /// - `group_stage_1`: Predicted results of the group stage 1 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_2`: Predicted results of the group stage 2 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_3`: Predicted results of the group stage 3 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `round_of_16`: Predicted results of the round of 16 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `quarter_finals`: Predicted results of the quarter finals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    pub fn create_sweepstake_tsc(
-        ctx: Context<CreateSweepstakeDust>,
-        data: SweepstakeData,
-    ) -> Result<()> {
-        let user = &mut ctx.accounts.user_state;
-        let sweepstake = &mut ctx.accounts.sweepstake_state;
-
-        create_sweepstake(ctx.accounts.authority.key(), user, sweepstake, &data)?;
-        token_transfer(ctx.accounts.to_transfer_context(), TSC_PER_SWEEPSTAKE)?;
-
-        Ok(())
-    }
-
-    /// Create sweepstake and pay in $LABS (Launchlabs token) for it
-    /// - A sweepstake can be created before the start of the World Cup
-    /// - All the input data must be valid
-    /// - User cannot exceed a number of sweepstakes per wallet
-    /// - Sweepstake must be paid in $LABS
-    /// Input data:
-    /// - `id`: Sweepstake ID from the database (reference ID)
-    /// - `world_champion`: ISO 3166-1 alpha-2 country format of the predicted world champion
-    /// - `group_stage_1`: Predicted results of the group stage 1 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_2`: Predicted results of the group stage 2 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `group_stage_3`: Predicted results of the group stage 3 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `round_of_16`: Predicted results of the round of 16 in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `quarter_finals`: Predicted results of the quarter finals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `semifinals`: Predicted results of the semifinals in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `third_place_game`: Predicted results of the third place game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    /// - `final_game`: Predicted results of the final game in the `XX-XX=0:0;` format (where XX is ISO 3166-1 alpha-2 country format)
-    pub fn create_sweepstake_labs(
-        ctx: Context<CreateSweepstakeDust>,
-        data: SweepstakeData,
-    ) -> Result<()> {
-        let user = &mut ctx.accounts.user_state;
-        let sweepstake = &mut ctx.accounts.sweepstake_state;
-
-        create_sweepstake(ctx.accounts.authority.key(), user, sweepstake, &data)?;
-        token_transfer(ctx.accounts.to_transfer_context(), LABS_PER_SWEEPSTAKE)?;
+        let supported_token =
+            validate_supported_token(&ctx.accounts.mint, &ctx.accounts.dagoats_wallet)?;
+        token_transfer(
+            ctx.accounts.to_transfer_context(),
+            supported_token.sweepstake_price,
+        )?;
 
         Ok(())
     }
@@ -248,7 +178,7 @@ impl<'info> CreateSweepstakeSol<'info> {
 }
 
 #[derive(Accounts)]
-pub struct CreateSweepstakeDust<'info> {
+pub struct CreateSweepstakeSpl<'info> {
     #[account(mut, has_one = authority)]
     pub user_state: Account<'info, User>,
     #[account(
@@ -260,122 +190,30 @@ pub struct CreateSweepstakeDust<'info> {
     pub sweepstake_state: Account<'info, Sweepstake>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account(
-        address = DUST_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
-    )]
+    #[account()]
     pub mint: Account<'info, Mint>,
     #[account(
         mut,
         owner = authority.key(),
         token::mint = mint,
     )]
-    pub user_dust_wallet: Account<'info, TokenAccount>,
+    pub user_wallet: Account<'info, TokenAccount>,
     #[account(
         mut,
-        address = DUST_WALLET_ADDRESS.parse::<Pubkey>().unwrap(),
-    )]
-    pub dagoats_wallet: Account<'info, TokenAccount>,
-    pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-}
-
-impl<'info> CreateSweepstakeDust<'info> {
-    pub fn to_transfer_context(
-        &self,
-    ) -> CpiContext<'info, 'info, 'info, 'info, TokenTransfer<'info>> {
-        let accounts = TokenTransfer {
-            authority: self.authority.to_account_info(),
-            from: self.user_dust_wallet.to_account_info(),
-            to: self.dagoats_wallet.to_account_info(),
-        };
-        CpiContext::new(self.token_program.to_account_info(), accounts)
-    }
-}
-
-#[derive(Accounts)]
-pub struct CreateSweepstakeTsc<'info> {
-    #[account(mut, has_one = authority)]
-    pub user_state: Account<'info, User>,
-    #[account(
-        init,
-        payer = authority,
-        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + id
-        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
-    )]
-    pub sweepstake_state: Account<'info, Sweepstake>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
-    #[account(
-        address = TSC_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
-    )]
-    pub mint: Account<'info, Mint>,
-    #[account(
-        mut,
-        owner = authority.key(),
         token::mint = mint,
     )]
-    pub user_tsc_wallet: Account<'info, TokenAccount>,
-    #[account(
-        mut,
-        address = TSC_WALLET_ADDRESS.parse::<Pubkey>().unwrap(),
-    )]
     pub dagoats_wallet: Account<'info, TokenAccount>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }
 
-impl<'info> CreateSweepstakeTsc<'info> {
+impl<'info> CreateSweepstakeSpl<'info> {
     pub fn to_transfer_context(
         &self,
     ) -> CpiContext<'info, 'info, 'info, 'info, TokenTransfer<'info>> {
         let accounts = TokenTransfer {
             authority: self.authority.to_account_info(),
-            from: self.user_tsc_wallet.to_account_info(),
-            to: self.dagoats_wallet.to_account_info(),
-        };
-        CpiContext::new(self.token_program.to_account_info(), accounts)
-    }
-}
-
-#[derive(Accounts)]
-pub struct CreateSweepstakeLabs<'info> {
-    #[account(mut, has_one = authority)]
-    pub user_state: Account<'info, User>,
-    #[account(
-        init,
-        payer = authority,
-        // discriminator + authority + world_champion + group_stage_1 + group_stage_2 + group_stage_3 + round_of_16 + quarter_finals + semifinals + third_place_game + final_game + submitted_at + pre_sweepstake_key + id
-        space = 8 + 32 + 8 + 768 + 768 + 768 + 384 + 192 + 96 + 48 + 48 + 8 + std::mem::size_of::<Option<Pubkey>>() + 8,
-    )]
-    pub sweepstake_state: Account<'info, Sweepstake>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
-    #[account(
-        address = LABS_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
-    )]
-    pub mint: Account<'info, Mint>,
-    #[account(
-        mut,
-        owner = authority.key(),
-        token::mint = mint,
-    )]
-    pub user_labs_wallet: Account<'info, TokenAccount>,
-    #[account(
-        mut,
-        address = LABS_WALLET_ADDRESS.parse::<Pubkey>().unwrap(),
-    )]
-    pub dagoats_wallet: Account<'info, TokenAccount>,
-    pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-}
-
-impl<'info> CreateSweepstakeLabs<'info> {
-    pub fn to_transfer_context(
-        &self,
-    ) -> CpiContext<'info, 'info, 'info, 'info, TokenTransfer<'info>> {
-        let accounts = TokenTransfer {
-            authority: self.authority.to_account_info(),
-            from: self.user_labs_wallet.to_account_info(),
+            from: self.user_wallet.to_account_info(),
             to: self.dagoats_wallet.to_account_info(),
         };
         CpiContext::new(self.token_program.to_account_info(), accounts)
