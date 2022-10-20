@@ -4,6 +4,8 @@ Solana smart contract of DaGOATs Sweepstake
 
 ## Usage
 
+- Devnet program ID: `7fjExfzR1qVGjj3bQDmDnHGs5fshPFE1nEZdCbCWCaed`
+
 ```shell
 # use specific versions of anchor, node and rust
 avm use 0.25.0
@@ -15,6 +17,9 @@ anchor build
 
 # run tests
 anchor test
+
+# deploy
+anchor deploy --provider.cluster <mainnet|devnet>
 ```
 
 ## How does it work
