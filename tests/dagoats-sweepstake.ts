@@ -23,7 +23,7 @@ describe("DaGOATs Sweepstake", () => {
     .DagoatsSweepstake as anchor.Program<DagoatsSweepstake>;
 
   let dagoatsAssociatedTokenAccount, fakeAssociatedTokenAccount;
-  const solPerSweepstake = LAMPORTS_PER_SOL;
+  const solPerSweepstake = 0.25 * LAMPORTS_PER_SOL;
   const dustPerSweepstake = 10 * LAMPORTS_PER_SOL;
   const dagoatsSolWalletAddress = new anchor.web3.PublicKey(
     "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1"
@@ -111,7 +111,7 @@ describe("DaGOATs Sweepstake", () => {
 
   before(() =>
     Promise.all([
-      airdrop(user, LAMPORTS_PER_SOL / 2),
+      airdrop(user, solPerSweepstake / 2),
       airdrop(anotherUser),
       airdrop(dustUser),
     ])

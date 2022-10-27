@@ -5,8 +5,8 @@ use anchor_lang::{
 };
 use anchor_spl::token::{Mint, TokenAccount};
 
-// @todo: change SOL price and wallet address
-pub const LAMPORTS_PER_SWEEPSTAKE: u64 = LAMPORTS_PER_SOL;
+// @todo: change SOL wallet address
+pub const LAMPORTS_PER_SWEEPSTAKE: u64 = 250_000_000;
 pub const SOL_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
 
 // @todo: change DUST price and wallet address
