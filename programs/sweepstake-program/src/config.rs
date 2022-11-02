@@ -14,7 +14,7 @@ const DUST_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
 const DUST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
 const DUST_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
 
-// @todo: change TSC mint address, price and wallet address
+// @todo: change TSC price and wallet address
 const TSC_MINT_ADDRESS: &str = "9eHik3eHYXzCvQVCJgSWzzsFUTV8vQdPyAfSCpugbJfe";
 const TSC_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
 const TSC_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";

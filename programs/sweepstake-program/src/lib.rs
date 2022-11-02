@@ -99,7 +99,7 @@ pub fn create_sweepstake(
     sweepstake.id = get_valid_id(data.id)?;
 
     user.current_sweepstake_key = Some(sweepstake.key());
-    user.sweepstakes_submitted = user.sweepstakes_submitted + 1;
+    user.sweepstakes_submitted += 1;
 
     Ok(())
 }

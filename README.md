@@ -16,6 +16,7 @@ rustup default nightly
 anchor build
 
 # run tests
+# Before you run the tests it is necessary to uncomment the lines 69 to 73 in the config.rs file otherwise the DUST test part will fail
 anchor test
 
 # deploy

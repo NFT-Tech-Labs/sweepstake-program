@@ -21,11 +21,7 @@ pub fn validate_supported_token(
 }
 
 pub fn get_valid_sweepstake_input(data: String, expected_length: usize) -> Result<String> {
-    let input = data
-        .split(";")
-        .filter(|&text| !text.is_empty())
-        .collect::<Vec<&str>>();
-    if input.len() != expected_length {
+    if data.split(';').filter(|&text| !text.is_empty()).count() != expected_length {
         return Err(error!(SweepstakeError::InvalidInputLength));
     }
     Ok(data)
