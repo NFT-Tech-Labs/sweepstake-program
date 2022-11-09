@@ -26,7 +26,7 @@ describe("DaGOATs Sweepstake", () => {
   const solPerSweepstake = 0.25 * LAMPORTS_PER_SOL;
   const dustPerSweepstake = 10 * LAMPORTS_PER_SOL;
   const dagoatsSolWalletAddress = new anchor.web3.PublicKey(
-    "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1"
+    "EbwXL2F6ejQ17ixM8uWND1GpKPotRZJMLA5f36Q1NkvQ"
   );
   const fakeDagoatsSolWalletAddress = new anchor.web3.PublicKey(
     "328vR2LdB9PaLq9eR7ad3Hj8shX9SzSZJhFpeeSkKXa4"

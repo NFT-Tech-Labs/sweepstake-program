@@ -25,7 +25,7 @@ const USDC_WALLET_ADDRESS: &str = "4CWQ73bjhZLhYcWmSpdSTUqdpwBywMkcrmHMyUyQhZgY"
 
 const TEST_MINT_ADDRESS: &str = "AKnL4NNf3DGWZJS6cPknBuEGnVsV4A4m5tgebLHaRSZ9";
 const TEST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
-const TEST_WALLET_ADDRESS: &str = "GreYZ8jbfridyk3y7TGqpTNRUuhAf7hzkvdZn8zwYHBh";
+const TEST_WALLET_ADDRESS: &str = "ABWfjgHT4AK1QoGrk7jKaRjMvK8t1GFourXR7nACRaUL";
 
 pub struct SupportedToken {
     pub sweepstake_price: u64,
