@@ -194,11 +194,8 @@ impl<'info> CreateSweepstakeSpl<'info> {
 
 security_txt! {
     name: "DaGOATs Sweepstake",
-    // @todo: Add sweepstake URL
-    project_url: "http://dagoats.io/",
-    // @todo: Add sweepstake contacts
-    contacts: "email:example@example.com,link:http://dagoats.io/,discord:SolRetroNFTs#8494",
-    // @todo: Add sweepstake policy
+    project_url: "http://sweepstake.dagoats.io/",
+    contacts: "email:info@dagoats.io,link:http://dagoats.io/,discord:SolRetroNFTs#8494",
     policy: "http://dagoats.io/",
     preferred_languages: "en,es"
 }

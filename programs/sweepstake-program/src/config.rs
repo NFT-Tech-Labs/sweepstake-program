@@ -5,24 +5,23 @@ use anchor_lang::{
 };
 use anchor_spl::token::{Mint, TokenAccount};
 
-// @todo: change SOL wallet address
 pub const LAMPORTS_PER_SWEEPSTAKE: u64 = 250_000_000;
-pub const SOL_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
+pub const SOL_WALLET_ADDRESS: &str = "EbwXL2F6ejQ17ixM8uWND1GpKPotRZJMLA5f36Q1NkvQ";
 
-// @todo: change DUST price and wallet address
+// @todo: change DUST price, check the decimals
 const DUST_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
 const DUST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
-const DUST_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
+const DUST_WALLET_ADDRESS: &str = "4CWQ73bjhZLhYcWmSpdSTUqdpwBywMkcrmHMyUyQhZgY";
 
-// @todo: change TSC price and wallet address
-const TSC_MINT_ADDRESS: &str = "9eHik3eHYXzCvQVCJgSWzzsFUTV8vQdPyAfSCpugbJfe";
-const TSC_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
-const TSC_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
+// @todo: change FORGE price, check the decimals
+const FORGE_MINT_ADDRESS: &str = "FoRGERiW7odcCBGU1bztZi16osPBHjxharvDathL5eds";
+const FORGE_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
+const FORGE_WALLET_ADDRESS: &str = "4CWQ73bjhZLhYcWmSpdSTUqdpwBywMkcrmHMyUyQhZgY";
 
-// @todo: change LABS mint address, price and wallet address
-const LABS_MINT_ADDRESS: &str = "DUSTawucrTsGU8hcqRdHDCbuYhCPADMLM2VcCb8VnFnQ";
-const LABS_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
-const LABS_WALLET_ADDRESS: &str = "53Xa3PVBki4ZT2qJoJPfiGiA42SyuvQ6WXj5ysw8TRv1";
+// @todo: change USDC price, check the decimals
+const USDC_MINT_ADDRESS: &str = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const USDC_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
+const USDC_WALLET_ADDRESS: &str = "4CWQ73bjhZLhYcWmSpdSTUqdpwBywMkcrmHMyUyQhZgY";
 
 const TEST_MINT_ADDRESS: &str = "AKnL4NNf3DGWZJS6cPknBuEGnVsV4A4m5tgebLHaRSZ9";
 const TEST_PER_SWEEPSTAKE: u64 = 10 * LAMPORTS_PER_SOL;
@@ -56,14 +55,14 @@ pub fn get_supported_tokens() -> Vec<SupportedToken> {
             DUST_PER_SWEEPSTAKE,
         ),
         SupportedToken::new(
-            String::from(TSC_MINT_ADDRESS),
-            String::from(TSC_WALLET_ADDRESS),
-            TSC_PER_SWEEPSTAKE,
+            String::from(FORGE_MINT_ADDRESS),
+            String::from(FORGE_WALLET_ADDRESS),
+            FORGE_PER_SWEEPSTAKE,
         ),
         SupportedToken::new(
-            String::from(LABS_MINT_ADDRESS),
-            String::from(LABS_WALLET_ADDRESS),
-            LABS_PER_SWEEPSTAKE,
+            String::from(USDC_MINT_ADDRESS),
+            String::from(USDC_WALLET_ADDRESS),
+            USDC_PER_SWEEPSTAKE,
         ),
         // @todo: for testing purposes only!
         // SupportedToken::new(
