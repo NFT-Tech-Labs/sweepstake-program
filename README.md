@@ -4,7 +4,7 @@ Solana smart contract of DaGOATs Sweepstake
 
 ## Usage
 
-- Devnet program ID: `7fjExfzR1qVGjj3bQDmDnHGs5fshPFE1nEZdCbCWCaed`
+- Devnet program ID: `AuDm9hEenfd8WgNHjr49dcApSBXWhzYkwrwPsHMvVAdE`
 
 ```shell
 # use specific versions of anchor, node and rust
