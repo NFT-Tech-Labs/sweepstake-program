@@ -17,7 +17,7 @@ pub mod error;
 pub mod state;
 pub mod validator;
 
-declare_id!("AuDm9hEenfd8WgNHjr49dcApSBXWhzYkwrwPsHMvVAdE");
+declare_id!("BQoZJCb4arM2NypHHVHejAgs7VD31qcWsc1KGwqKexH3");
 
 #[program]
 pub mod dagoats_sweepstake {
